@@ -1,18 +1,41 @@
 <?php
-// Get database credentials from environment variables if available, otherwise use local defaults
-$servername = getenv('DB_HOST') ?: "localhost";
-$username   = getenv('DB_USERNAME') ?: "root";
-$password   = getenv('DB_PASSWORD') ?: "";
-$dbname     = getenv('DB_NAME') ?: "coderwanda_db";
-$port       = getenv('DB_PORT') ?: 3306; // optional, default MySQL port
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname, $port);
+/**
+ * Database Configuration
+ * School Management System - APICUR TSS
+ */
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+class Database
+{
+    private $host = "localhost";
+    private $db_name = "coderwanda_db";
+    private $username = "root";
+    private $password = "";
+    public $conn;
+
+    /**
+     * Get database connection
+     */
+    public function getConnection()
+    {
+        $this->conn = null;
+
+        try {
+            $this->conn = new PDO(
+                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
+                $this->username,
+                $this->password,
+                array(
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
+                )
+            );
+        } catch (PDOException $exception) {
+            echo "Connection error: " . $exception->getMessage();
+        }
+
+        return $this->conn;
+    }
 }
-
-// Optional: confirm connection
-// echo "Connected successfully!";
